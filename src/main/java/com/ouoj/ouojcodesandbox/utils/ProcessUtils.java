@@ -1,6 +1,8 @@
 package com.ouoj.ouojcodesandbox.utils;
 
+
 import com.ouoj.ouojcodesandbox.model.ExecuteMessage;
+import org.springframework.util.StopWatch;
 
 import java.io.*;
 
@@ -11,16 +13,18 @@ public class ProcessUtils {
 
     /**
      * 执行进程并获取信息
+     *
      * @param runProcess
      * @param opName
      * @return
      */
-    public static ExecuteMessage runProcessAndGetMessage(Process runProcess,String opName) {
+    public static ExecuteMessage runProcessAndGetMessage(Process runProcess, String opName) {
 
         ExecuteMessage executeMessage = new ExecuteMessage();
 
         try {
-
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             //等待程序执行，获取错误码
             int exitValue = runProcess.waitFor();
             executeMessage.setExitValue(exitValue);
@@ -54,6 +58,8 @@ public class ProcessUtils {
                 executeMessage.setErrorMessage(errorCompileOutputStringBuilder.toString());
                 System.out.println(errorCompileOutputStringBuilder);
             }
+            stopWatch.stop();
+            executeMessage.setTime(stopWatch.getLastTaskTimeMillis());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,11 +69,12 @@ public class ProcessUtils {
 
     /**
      * 交互式进程处理方法
+     *
      * @param runProcess
      * @param args
      * @return
      */
-    public static ExecuteMessage runInteractProcessAndGetMessage(Process runProcess,String args) {
+    public static ExecuteMessage runInteractProcessAndGetMessage(Process runProcess, String args) {
 
         ExecuteMessage executeMessage = new ExecuteMessage();
 
@@ -84,7 +91,7 @@ public class ProcessUtils {
             outputStreamWriter.flush();
 
             //分批获取进程的正确输出
-            BufferedReader runBufferedReader = new BufferedReader(new InputStreamReader(inputStream ));
+            BufferedReader runBufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder runOutputStringBuilder = new StringBuilder();
             //逐行读取
             String runOutputLine;
